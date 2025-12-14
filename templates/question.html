@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}{{ question.title }} - Programming Help Forum{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h3>{{ question.title }}</h3>
+                <p>{{ question.content }}</p>
+                <small class="text-muted">Asked by {{ question.author.username }} in {{ question.topic.name }} on {{ question.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+            </div>
+        </div>
+        <h4>Answers</h4>
+        {% if answers %}
+            {% for answer in answers %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <p>{{ answer.content }}</p>
+                        <small class="text-muted">Answered by {{ answer.author.username }} on {{ answer.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                        <div class="mt-2">
+                            <a href="{{ url_for('vote', answer_id=answer.id, vote_type=1) }}" class="btn btn-sm btn-success">Upvote ({{ answer.score }})</a>
+                            <a href="{{ url_for('vote', answer_id=answer.id, vote_type=-1) }}" class="btn btn-sm btn-danger">Downvote</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No answers yet.</p>
+        {% endif %}
+        {% if current_user.is_authenticated %}
+            <h4>Your Answer</h4>
+            <form method="POST" action="{{ url_for('answer', question_id=question.id) }}">
+                {{ form.hidden_tag() }}
+                <div class="mb-3">
+                    {{ form.content(class="form-control", rows=4) }}
+                    {% if form.content.errors %}
+                        {% for error in form.content.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                {{ form.submit(class="btn btn-primary") }}
+            </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
