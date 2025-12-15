@@ -5,7 +5,6 @@
 {% block content %}
 <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
     <h2 style="margin-bottom: 10px;">{{ user.username }}</h2>
-    <p>📧 {{ user.email }}</p>
     {% if user.major %}
         <p>📚 {{ user.major }}</p>
     {% endif %}

@@ -15,7 +15,6 @@ db = SQLAlchemy(app)
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
     major = db.Column(db.String(100))
     year = db.Column(db.String(20))
@@ -71,21 +70,18 @@ def index():
 def signup():
     if request.method == 'POST':
         username = request.form['username']
-        email = request.form['email']
         password = request.form['password']
         major = request.form.get('major', '')
         year = request.form.get('year', '')
         
+        # Check if user exists
         if User.query.filter_by(username=username).first():
             flash('Username already exists!', 'error')
             return redirect(url_for('signup'))
         
-        if User.query.filter_by(email=email).first():
-            flash('Email already registered!', 'error')
-            return redirect(url_for('signup'))
-        
+        # Create new user with hashed password
         hashed_password = generate_password_hash(password, method='pbkdf2:sha256', salt_length=16)
-        new_user = User(username=username, email=email, password_hash=hashed_password, major=major, year=year)
+        new_user = User(username=username, password_hash=hashed_password, major=major, year=year)
         
         db.session.add(new_user)
         db.session.commit()
