@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="text-align: center; margin-bottom: 30px;">
+    <h2 style="color: #333; margin-bottom: 10px;">Welcome to College Help Forum</h2>
+    <p style="color: #666;">Ask questions, share knowledge, help fellow students succeed!</p>
+</div>
+
+<div style="margin-bottom: 30px;">
+    <h3 style="margin-bottom: 15px;">Filter by Topic</h3>
+    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+        <a href="{{ url_for('index') }}" class="topic-badge" style="text-decoration: none; {% if not current_topic %}background: #667eea; color: white;{% endif %}">
+            All Topics
+        </a>
+        {% for topic in topics %}
+            <a href="{{ url_for('index', topic=topic.id) }}" class="topic-badge" style="text-decoration: none; {% if current_topic == topic.id|string %}background: #667eea; color: white;{% endif %}">
+                {{ topic.name }}
+            </a>
+        {% endfor %}
+    </div>
+</div>
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h3>Recent Questions</h3>
+    {% if session.user_id %}
+        <a href="{{ url_for('ask_question') }}" class="btn">+ Ask a Question</a>
+    {% else %}
+        <a href="{{ url_for('login') }}" class="btn">Login to Ask</a>
+    {% endif %}
+</div>
+
+{% if questions %}
+    {% for question in questions %}
+        <div class="card">
+            <h3 style="margin-bottom: 10px;">
+                <a href="{{ url_for('view_question', question_id=question.id) }}" style="color: #333; text-decoration: none;">
+                    {{ question.title }}
+                </a>
+            </h3>
+            <span class="topic-badge">{{ question.topic.name }}</span>
+            <p style="color: #666; margin: 15px 0;">{{ question.content[:200] }}{% if question.content|length > 200 %}...{% endif %}</p>
+            <div class="user-info">
+                Posted by <a href="{{ url_for('profile', username=question.author.username) }}" style="color: #667eea;">{{ question.author.username }}</a>
+                • {{ question.created_at.strftime('%b %d, %Y') }}
+                • {{ question.answers|length }} answer{% if question.answers|length != 1 %}s{% endif %}
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <div class="card" style="text-align: center; padding: 40px;">
+        <p style="color: #666; font-size: 18px;">No questions yet. Be the first to ask!</p>
+    </div>
+{% endif %}
+{% endblock %}

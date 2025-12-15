@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Ask a Question - College Help Forum{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+    <h2 style="margin-bottom: 20px; color: #333;">Ask a Question</h2>
+    <p style="color: #666; margin-bottom: 30px;">Get help from fellow students on any topic!</p>
+    
+    <form method="POST" action="{{ url_for('ask_question') }}">
+        <label for="title">Question Title *</label>
+        <input type="text" id="title" name="title" placeholder="What's your question?" required>
+        
+        <label for="topic_id">Topic *</label>
+        <select id="topic_id" name="topic_id" required>
+            <option value="">Select a topic</option>
+            {% for topic in topics %}
+                <option value="{{ topic.id }}">{{ topic.name }}</option>
+            {% endfor %}
+        </select>
+        
+        <label for="content">Question Details *</label>
+        <textarea id="content" name="content" rows="8" placeholder="Provide more details about your question..." required></textarea>
+        
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button type="submit" class="btn">Post Question</button>
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

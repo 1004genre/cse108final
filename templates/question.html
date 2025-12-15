@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}{{ question.title }} - College Help Forum{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 20px;">
+    <a href="{{ url_for('index') }}" style="color: #667eea; text-decoration: none;">← Back to all questions</a>
+</div>
+
+<div class="card">
+    <span class="topic-badge">{{ question.topic.name }}</span>
+    <h2 style="margin: 15px 0; color: #333;">{{ question.title }}</h2>
+    <p style="color: #666; line-height: 1.6; white-space: pre-wrap;">{{ question.content }}</p>
+    <div class="user-info" style="margin-top: 20px;">
+        Asked by <a href="{{ url_for('profile', username=question.author.username) }}" style="color: #667eea;">{{ question.author.username }}</a>
+        {% if question.author.major %} ({{ question.author.major }}){% endif %}
+        • {{ question.created_at.strftime('%b %d, %Y at %I:%M %p') }}
+    </div>
+</div>
+
+<h3 style="margin: 30px 0 20px 0;">{{ answers|length }} Answer{% if answers|length != 1 %}s{% endif %}</h3>
+
+{% if session.user_id %}
+    <div class="card" style="background: #f8f9fa;">
+        <h4 style="margin-bottom: 15px;">Your Answer</h4>
+        <form method="POST" action="{{ url_for('view_question', question_id=question.id) }}">
+            <textarea name="content" rows="6" placeholder="Share your knowledge..." required></textarea>
+            <button type="submit" class="btn" style="margin-top: 10px;">Post Answer</button>
+        </form>
+    </div>
+{% else %}
+    <div class="card" style="background: #f8f9fa; text-align: center;">
+        <p style="color: #666;">Please <a href="{{ url_for('login') }}" style="color: #667eea;">login</a> to post an answer</p>
+    </div>
+{% endif %}
+
+{% for answer in answers %}
+    <div class="card">
+        <p style="color: #333; line-height: 1.6; white-space: pre-wrap;">{{ answer.content }}</p>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+            <div class="user-info">
+                Answered by <a href="{{ url_for('profile', username=answer.author.username) }}" style="color: #667eea;">{{ answer.author.username }}</a>
+                {% if answer.author.major %} ({{ answer.author.major }}){% endif %}
+                • {{ answer.created_at.strftime('%b %d, %Y') }}
+            </div>
+            
+            {% if session.user_id %}
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <a href="{{ url_for('vote', answer_id=answer.id, vote_type='upvote') }}" style="text-decoration: none; color: #28a745; font-size: 20px;" title="Upvote">
+                        ⬆ {{ answer.upvotes }}
+                    </a>
+                    <a href="{{ url_for('vote', answer_id=answer.id, vote_type='downvote') }}" style="text-decoration: none; color: #dc3545; font-size: 20px;" title="Downvote">
+                        ⬇ {{ answer.downvotes }}
+                    </a>
+                </div>
+            {% else %}
+                <div style="color: #666;">
+                    ⬆ {{ answer.upvotes }} | ⬇ {{ answer.downvotes }}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endfor %}
+
+{% if not answers %}
+    <div class="card" style="text-align: center; padding: 40px; background: #f8f9fa;">
+        <p style="color: #666;">No answers yet. Be the first to help!</p>
+    </div>
+{% endif %}
+{% endblock %}
